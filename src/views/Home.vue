@@ -109,7 +109,7 @@ export default {
         this.search.pageIndex = value
       }
       const datasource = await this.$axios.get(
-        `/api/topologies?pageIndex=${this.search.pageIndex}&pageCount=${this.search.pageCount}`
+        `http://topology.le5le.com/api/topologies?pageIndex=${this.search.pageIndex}&pageCount=${this.search.pageCount}`
       )
       this.data = datasource.data
       this.loading = false

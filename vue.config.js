@@ -38,21 +38,20 @@ module.exports = {
   devServer: {
     open: process.platform === 'darwin',
     disableHostCheck: false,
-    host: 'https://aesthetlc.github.io',
-    // host: '0.0.0.0',
-    // port: 8088,
-    proxy: {
-      '/api': {
-        target: 'http://topology.le5le.com/',
-        changeOrigin: true,
-        onProxyReq: function (proxyReq) {
-          proxyReq.removeHeader('origin')
-        }
-      },
-      '/image': {
-        target: 'http://topology.le5le.com/'
-      }
-    },
+    host: '0.0.0.0',
+    port: 8088,
+    // proxy: {
+    //   '/api': {
+    //     target: 'http://topology.le5le.com/',
+    //     changeOrigin: true,
+    //     onProxyReq: function (proxyReq) {
+    //       proxyReq.removeHeader('origin')
+    //     }
+    //   },
+    //   '/image': {
+    //     target: 'http://topology.le5le.com/'
+    //   }
+    // },
     https: false,
     hotOnly: false // See https://github.com/vuejs/vue-cli/blob/dev/docs/cli-service.md#configuring-proxy
     // before: app => {}
