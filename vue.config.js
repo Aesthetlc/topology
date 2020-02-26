@@ -40,7 +40,7 @@ module.exports = {
     disableHostCheck: false,
     host: 'https://aesthetlc.github.io',
     // host: '0.0.0.0',
-    port: 8088,
+    // port: 8088,
     proxy: {
       '/api': {
         target: 'http://topology.le5le.com/',
