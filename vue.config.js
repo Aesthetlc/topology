@@ -38,8 +38,8 @@ module.exports = {
   devServer: {
     open: process.platform === 'darwin',
     disableHostCheck: false,
-    // host: 'https://aesthetlc.github.io',
-    host: '0.0.0.0',
+    host: 'https://aesthetlc.github.io',
+    // host: '0.0.0.0',
     port: 8088,
     proxy: {
       '/api': {
