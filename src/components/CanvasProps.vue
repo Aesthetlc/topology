@@ -138,18 +138,68 @@
       <div class="items">
         <div class="grid">
           <div class="first">
-            <div>边框样式（未完成）</div>
-            <div style="border:1px solid #000;height:40px;width:105px;background-color:#fff;line-height:40px" v-html="ww"></div>
+            <div style="position:relative">边框样式</div>
+            <div style="position:absolute;z-index:9999;pointer-events:none">
+              <div v-show="props.node.dash === 0 && linshi === 0">
+                <div v-html="options[0].label"></div>
+              </div>
+              <div v-show="props.node.dash === 1 && linshi === 0">
+                <div v-html="options[1].label"></div>
+              </div>
+              <div v-show="props.node.dash === 2 && linshi === 0">
+                <div v-html="options[2].label"></div>
+              </div>
+              <div v-show="props.node.dash === 3 && linshi === 0">
+                <div v-html="options[3].label"></div>
+              </div>
+            </div>
+            <el-select
+              ref="select_svg"
+              v-model="addModel.svg"
+              @change="changeStatus"
+              placeholder=""
+            >
+              <el-option
+                v-for="item in options"
+                :key="item.index"
+                :label="item.label"
+                :value="`${item.value}|${item.index}|${item.label}`"
+              >
+                <div v-html="item.label"></div>
+              </el-option>
+            </el-select>
           </div>
           <div class="second">
             <div>边框宽度</div>
             <div>
               <el-input-number
-                v-model="props.node.rect.y"
+                v-model="props.node.lineWidth"
                 controls-position="right"
                 @change="onChange"
               ></el-input-number>
             </div>
+          </div>
+        </div>
+      </div>
+      <div class="items">
+        <div class="grid">
+          <div class="first">
+            <div>边框颜色</div>
+            <div>
+              <el-input
+                v-model="props.node.strokeStyle"
+                controls-position="right"
+                @change="onChange"
+              ><colorPicker slot="prefix" style="top:11.5px" v-model="props.node.strokeStyle" /></el-input>
+            </div>
+          </div>
+          <div class="second">
+            <div>透明度(0-1)</div>
+            <el-input-number
+              v-model="props.node.globalAlpha"
+              controls-position="right"
+              @change="onChange"
+            ></el-input-number>
           </div>
         </div>
       </div>
@@ -166,11 +216,51 @@ export default {
       dialogVisibleLoad: false,
       editMsg: '',
       newMsg: '',
-      ww: `<svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+      options: [
+        {
+          index: 0,
+          value: '',
+          name: '实线',
+          label: `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="height:20px;width:70px">
                       <g fill="none" stroke="black" stroke-width="1">
-                        <path d="M10 19 l85 0" />
+                        <path d="M8 19 l85 0" />
                       </g>
                     </svg>`
+        },
+        {
+          index: 1,
+          value: '',
+          name: '虚线',
+          label: `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="height:20px;width:70px">
+                      <g fill="none" stroke="black" stroke-width="1">
+                        <path stroke-dasharray="5,5" d="M10 19 l85 0" />
+                      </g>
+                    </svg>`
+        },
+        {
+          index: 2,
+          value: '',
+          name: '',
+          label: `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="height:20px;width:70px">
+                      <g fill="none" stroke="black" stroke-width="1">
+                        <path stroke-dasharray="10,10" d="M10 19 l85 0" />
+                      </g>
+                    </svg>`
+        },
+        {
+          index: 3,
+          value: '',
+          name: '',
+          label: `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="height:20px;width:70px">
+                      <g fill="none" stroke="black" stroke-width="1">
+                        <path stroke-dasharray="10,10,2,10" d="M10 19 l85 0" />
+                      </g>
+                    </svg>`
+        }
+      ],
+      addModel: {
+        svg: ''
+      }
     }
   },
   props: {
@@ -182,6 +272,10 @@ export default {
     props: {
       type: Object,
       require: true
+    },
+    linshi: {
+      type: Number,
+      default: 0
     }
   },
   components: {
@@ -194,6 +288,37 @@ export default {
   methods: {
     onChange () {
       this.$emit('change', this.props.node)
+    },
+    changeStatus (params) {
+      // this.linshi = 999
+      const val = params.split('|')[0]
+      const dash = params.split('|')[1]
+      const label = params.split('|')[2]
+      // el-select实际上是两层div包裹的input
+      this.addModel.svg = val
+      // 获取当前el-select标签第一层div
+      const dom = this.$refs.select_svg.$el
+      // 创建需要添加到其中的标签 并填充内容
+      var arr = document.getElementsByClassName('el-input__prefix')
+      if ((arr.length !== 0) & (arr !== undefined)) {
+        for (let i = 0; i < arr.length; i++) {
+          var parent = arr[i].parentElement
+          parent.removeChild(arr[i])
+        }
+      }
+      const svgDom = document.createElement('span') // ('<svg-svg ref="svgRef" svg-class="' + val + '" style="float: left;width: 3%;height: 30px;border: 1px solid #dcdfe6;border-right:none;" />');
+      svgDom.setAttribute('class', 'el-input__prefix')
+      svgDom.innerHTML = label
+      // 将创建的标签添加到父节点(第二层div)
+      dom.children[0].appendChild(svgDom)
+      // 得到el-select中的input标签
+      const inputDom = dom.children[0].children[0]
+      inputDom.setAttribute('style', 'padding-left: 30px;')
+      // 将添加的标签放到input前面
+      dom.children[0].insertBefore(svgDom, inputDom)
+      this.props.node.dash = Number(dash)
+      this.$emit('change', this.props.node)
+      this.$emit('changeLinshi', 999)
     },
     // json展示
     showJson () {
@@ -244,7 +369,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-body{
+body {
   padding: 0;
   margin: 0;
 }
@@ -252,6 +377,10 @@ body{
   display: block;
   color: #f60 !important;
   text-decoration: underline;
+}
+
+/deep/ .el-submenu__title {
+  border-top: 1px solid #ccc;
 }
 
 .title {
@@ -316,5 +445,8 @@ body{
 }
 .el-dialog__wrapper /deep/.el-dialog__body {
   padding: 0 !important;
+}
+.el-select /deep/ .el-input__inner {
+  color: transparent;
 }
 </style>

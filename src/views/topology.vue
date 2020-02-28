@@ -41,7 +41,9 @@
         <CanvasProps
           :canvas="canvas"
           :props.sync="props"
+          :linshi="linshi"
           @change="onUpdateProps"
+          @changeLinshi="onUpadteLinshi"
         ></CanvasProps>
       </div>
     </el-container>
@@ -782,16 +784,33 @@ export default {
         top: null,
         bottom: null
       },
-      loading: true
+      loading: true,
+      linshi: 0
     }
   },
   components: {
     CanvasProps,
     CanvasContextMenu
   },
+  computed: {
+    event () {
+      return this.$store.state.event
+    }
+  },
+  watch: {
+    event (curVal) {
+      if (this['handle_' + curVal.name]) {
+        this['handle_' + curVal.name](curVal.data)
+      }
+    },
+    $route (val) {
+      this.open()
+    }
+  },
   created () {
     canvasRegister()
     document.onclick = event => {
+      this.linshi = 0
       this.contextmenu = {
         left: null,
         top: null,
@@ -802,11 +821,15 @@ export default {
   mounted () {
     this.canvasOptions.on = this.onMessage
     this.canvas = new Topology('topology-canvas', this.canvasOptions)
-    this.open()
+    this.$store.state.canvas = this.canvas
+    if (this.$route.query.id !== undefined) {
+      this.open()
+    } else {
+      this.loading = false
+    }
   },
   methods: {
     async open () {
-      console.log(this.$route.query.id)
       this.loading = true
       if (!this.$route.query.id) {
         return
@@ -819,10 +842,14 @@ export default {
       }
       this.loading = false
     },
+    onUpadteLinshi (val) {
+      this.linshi = val
+    },
     onDrag (event, node) {
       event.dataTransfer.setData('Text', JSON.stringify(node.data))
     },
     onMessage (event, data) {
+      console.log(event, data)
       switch (event) {
         case 'node':
         case 'addNode':
@@ -836,6 +863,7 @@ export default {
           break
         case 'line':
         case 'addLine':
+          debugger
           this.props = {
             node: null,
             line: data,
@@ -887,7 +915,26 @@ export default {
         case 'resize':
         case 'scale':
         case 'locked':
+          if (this.canvas && this.canvas.data) {
+            this.$store.commit('data', {
+              scale: this.canvas.data.scale || 1,
+              lineName: this.canvas.data.lineName,
+              fromArrowType: this.canvas.data.fromArrowType,
+              toArrowType: this.canvas.data.toArrowType,
+              fromArrowlockedType: this.canvas.data.locked
+            })
+          }
       }
+    },
+    handle_state (data) {
+      this.canvas.data[data.key] = data.value
+      this.$store.commit('data', {
+        scale: this.canvas.data.scale || 1,
+        lineName: this.canvas.data.lineName,
+        fromArrowType: this.canvas.data.fromArrowType,
+        toArrowType: this.canvas.data.toArrowType,
+        fromArrowlockedType: this.canvas.data.locked
+      })
     },
     getLocked (data) {
       let locked = true
@@ -944,7 +991,7 @@ body {
 .left,
 .right {
   background-color: #f8f8f8;
-  height: 100vh;
+  height: calc(100vh - 60px);
 }
 .left {
   .title {
@@ -983,7 +1030,8 @@ body {
   padding: 0.1rem 0;
   background-color: #f8f8f8;
   border-left: 1px solid #d9d9d9;
-  overflow-y: auto;
+  overflow-x: hidden;
+  // overflow: auto;
   position: relative;
 }
 .context-menu {
@@ -993,7 +1041,7 @@ body {
 .full {
   flex: 1;
   position: relative;
-  overflow: auto;
+  // overflow: auto;
   background: #fff;
 }
 </style>

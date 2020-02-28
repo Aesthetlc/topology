@@ -40,18 +40,18 @@ module.exports = {
     disableHostCheck: false,
     host: '0.0.0.0',
     port: 8088,
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://topology.le5le.com/',
-    //     changeOrigin: true,
-    //     onProxyReq: function (proxyReq) {
-    //       proxyReq.removeHeader('origin')
-    //     }
-    //   },
-    //   '/image': {
-    //     target: 'http://topology.le5le.com/'
-    //   }
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://topology.le5le.com/',
+        changeOrigin: true,
+        onProxyReq: function (proxyReq) {
+          proxyReq.removeHeader('origin')
+        }
+      },
+      '/image': {
+        target: 'http://topology.le5le.com/'
+      }
+    },
     https: false,
     hotOnly: false // See https://github.com/vuejs/vue-cli/blob/dev/docs/cli-service.md#configuring-proxy
     // before: app => {}
