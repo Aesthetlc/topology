@@ -52,6 +52,10 @@
 
 <script>
 import CanvasProps from './../components/CanvasProps'
+// eslint-disable-next-line no-unused-vars
+import { node } from 'topology-core/models/node'
+// eslint-disable-next-line no-unused-vars
+import { Line } from 'topology-core/models/line'
 import CanvasContextMenu from './../components/CanvasContextMenu'
 import { Topology } from 'topology-core'
 import { canvasRegister } from './../services/canvas'
@@ -849,10 +853,10 @@ export default {
       event.dataTransfer.setData('Text', JSON.stringify(node.data))
     },
     onMessage (event, data) {
-      console.log(event, data)
       switch (event) {
         case 'node':
         case 'addNode':
+          debugger
           this.props = {
             node: data,
             line: null,
@@ -860,6 +864,7 @@ export default {
             nodes: null,
             locked: data.locked
           }
+          console.log(this.props.node, 'this.props.node')
           break
         case 'line':
         case 'addLine':
@@ -873,6 +878,7 @@ export default {
           }
           break
         case 'multi':
+          debugger
           this.props = {
             node: null,
             line: null,
@@ -882,6 +888,7 @@ export default {
           }
           break
         case 'space':
+          debugger
           this.props = {
             node: null,
             line: null,
@@ -894,6 +901,7 @@ export default {
           break
         case 'moveNodes':
         case 'resizeNodes':
+          debugger
           if (data.length > 1) {
             this.props = {
               node: null,
@@ -903,6 +911,7 @@ export default {
               locked: this.getLocked({ nodes: data })
             }
           } else {
+            debugger
             this.props = {
               node: data[0],
               line: null,
@@ -915,6 +924,7 @@ export default {
         case 'resize':
         case 'scale':
         case 'locked':
+          debugger
           if (this.canvas && this.canvas.data) {
             this.$store.commit('data', {
               scale: this.canvas.data.scale || 1,
@@ -925,6 +935,7 @@ export default {
             })
           }
       }
+      console.log(this.props, 'this.props-------------------------------------')
     },
     handle_state (data) {
       this.canvas.data[data.key] = data.value
@@ -1026,11 +1037,11 @@ body {
 }
 .props {
   flex-shrink: 0;
-  width: 15.4rem;
+  width: 280px;
   padding: 0.1rem 0;
   background-color: #f8f8f8;
   border-left: 1px solid #d9d9d9;
-  overflow-x: hidden;
+  overflow: hidden;
   // overflow: auto;
   position: relative;
 }

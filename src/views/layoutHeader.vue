@@ -161,7 +161,6 @@ export default {
   },
   methods: {
     onState (key, value) {
-      debugger
       this.$store.commit('emit', {
         name: 'state',
         data: {

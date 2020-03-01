@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- 选中为空 -->
     <el-menu
       :default-openeds="['1']"
       class="el-menu-vertical-demo"
@@ -137,8 +136,10 @@
       <div class="title" style="text-indent:1em"><p>边框选择</p></div>
       <div class="items">
         <div class="grid">
-          <div class="first">
-            <div style="position:relative">边框样式</div>
+          <div class="first borderStyle">
+            <div style="position:relative">
+              边框样式
+            </div>
             <div style="position:absolute;z-index:9999;pointer-events:none">
               <div v-show="props.node.dash === 0 && linshi === 0">
                 <div v-html="options[0].label"></div>
@@ -185,21 +186,65 @@
         <div class="grid">
           <div class="first">
             <div>边框颜色</div>
-            <div>
+            <div class="borderStyleColor">
               <el-input
                 v-model="props.node.strokeStyle"
                 controls-position="right"
                 @change="onChange"
-              ><colorPicker slot="prefix" style="top:11.5px" v-model="props.node.strokeStyle" /></el-input>
+                ><el-color-picker
+                  slot="prefix"
+                  size="mini"
+                  style="top:5px"
+                  v-model="props.node.strokeStyle"
+                  @change="onChange"
+                ></el-color-picker
+              ></el-input>
             </div>
           </div>
-          <div class="second">
-            <div>透明度(0-1)</div>
-            <el-input-number
+        </div>
+      </div>
+      <div class="items">
+        <div class="grid">
+          <div class="first">
+            <div>边框透明度(0-1)</div>
+            <el-input
               v-model="props.node.globalAlpha"
               controls-position="right"
               @change="onChange"
-            ></el-input-number>
+            ></el-input>
+          </div>
+          <div class="second">
+            <div>背景</div>
+            <el-select v-model="props.node.bkType">
+              <el-option
+                v-for="item in bkTypeOptions.list"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              >
+              </el-option>
+            </el-select>
+          </div>
+        </div>
+      </div>
+      <div class="items">
+        <div class="grid">
+          <div class="first">
+            <div>背景颜色{{ props.node.fillStyle }}</div>
+            <div class="borderStyleColor">
+              <el-input
+                v-model="props.node.fillStyle"
+                controls-position="right"
+                @change="onChange"
+                ><el-color-picker
+                  slot="prefix"
+                  size="mini"
+                  style="top:5px"
+                  v-model="props.node.fillStyle"
+                  @change="onChange"
+                ></el-color-picker
+              ></el-input>
+            </div>
           </div>
         </div>
       </div>
@@ -260,6 +305,25 @@ export default {
       ],
       addModel: {
         svg: ''
+      },
+      bkTypeOptions: {
+        id: 'id',
+        name: 'name',
+        list: [
+          {
+            id: 0,
+            name: '纯色背景'
+          },
+          {
+            id: 1,
+            name: '线性渐变'
+          },
+          {
+            id: 2,
+            name: '径向渐变'
+          }
+        ],
+        noDefaultOption: true
       }
     }
   },
@@ -270,8 +334,7 @@ export default {
       default: {}
     },
     props: {
-      type: Object,
-      require: true
+      type: Object
     },
     linshi: {
       type: Number,
@@ -282,11 +345,25 @@ export default {
     editor: require('vue2-ace-editor')
   },
   created () {},
+  watch: {
+    handler (newvalue) {
+      if (
+        !this.props.node.bkType ||
+        this.props.node.bkType === undefined ||
+        this.props.node.bkType == null ||
+        this.props.node.bkType === '' ||
+        this.props.node.bkType === 'null'
+      ) {
+        this.props.node.bkType = 0
+      }
+    }
+  },
   mounted () {
     this.init()
   },
   methods: {
     onChange () {
+      alert('改变了')
       this.$emit('change', this.props.node)
     },
     changeStatus (params) {
@@ -299,15 +376,21 @@ export default {
       // 获取当前el-select标签第一层div
       const dom = this.$refs.select_svg.$el
       // 创建需要添加到其中的标签 并填充内容
-      var arr = document.getElementsByClassName('el-input__prefix')
-      if ((arr.length !== 0) & (arr !== undefined)) {
-        for (let i = 0; i < arr.length; i++) {
-          var parent = arr[i].parentElement
-          parent.removeChild(arr[i])
-        }
+      // var arr = document.getElementsByClassName('el-input__prefix')
+      // if ((arr.length !== 0) & (arr !== undefined)) {
+      //   for (let i = 0; i < arr.length; i++) {
+      //     var parent = arr[i].parentElement
+      //     parent.removeChild(arr[i])
+      //   }
+      // }
+      if (document.getElementById('selectBorder')) {
+        const arr = document.getElementById('selectBorder')
+        arr.parentElement.removeChild(arr)
       }
+
       const svgDom = document.createElement('span') // ('<svg-svg ref="svgRef" svg-class="' + val + '" style="float: left;width: 3%;height: 30px;border: 1px solid #dcdfe6;border-right:none;" />');
       svgDom.setAttribute('class', 'el-input__prefix')
+      svgDom.setAttribute('id', 'selectBorder')
       svgDom.innerHTML = label
       // 将创建的标签添加到父节点(第二层div)
       dom.children[0].appendChild(svgDom)
@@ -446,7 +529,10 @@ body {
 .el-dialog__wrapper /deep/.el-dialog__body {
   padding: 0 !important;
 }
-.el-select /deep/ .el-input__inner {
+.borderStyle /deep/ .el-input__inner {
   color: transparent;
+}
+.borderStyleColor /deep/ .el-input__inner {
+  padding-left: 40px !important;
 }
 </style>
