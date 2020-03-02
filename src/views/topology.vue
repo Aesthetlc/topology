@@ -44,6 +44,7 @@
           :linshi="linshi"
           @change="onUpdateProps"
           @changeLinshi="onUpadteLinshi"
+          @changeLine="onUpadteLine"
         ></CanvasProps>
       </div>
     </el-container>
@@ -856,7 +857,6 @@ export default {
       switch (event) {
         case 'node':
         case 'addNode':
-          debugger
           this.props = {
             node: data,
             line: null,
@@ -864,11 +864,10 @@ export default {
             nodes: null,
             locked: data.locked
           }
-          console.log(this.props.node, 'this.props.node')
+          // console.log(this.props.node, 'this.props.node')
           break
         case 'line':
         case 'addLine':
-          debugger
           this.props = {
             node: null,
             line: data,
@@ -878,7 +877,6 @@ export default {
           }
           break
         case 'multi':
-          debugger
           this.props = {
             node: null,
             line: null,
@@ -888,7 +886,6 @@ export default {
           }
           break
         case 'space':
-          debugger
           this.props = {
             node: null,
             line: null,
@@ -901,7 +898,6 @@ export default {
           break
         case 'moveNodes':
         case 'resizeNodes':
-          debugger
           if (data.length > 1) {
             this.props = {
               node: null,
@@ -911,7 +907,6 @@ export default {
               locked: this.getLocked({ nodes: data })
             }
           } else {
-            debugger
             this.props = {
               node: data[0],
               line: null,
@@ -924,7 +919,6 @@ export default {
         case 'resize':
         case 'scale':
         case 'locked':
-          debugger
           if (this.canvas && this.canvas.data) {
             this.$store.commit('data', {
               scale: this.canvas.data.scale || 1,
@@ -935,7 +929,7 @@ export default {
             })
           }
       }
-      console.log(this.props, 'this.props-------------------------------------')
+      // console.log(this.props, 'this.props-------------------------------------')
     },
     handle_state (data) {
       this.canvas.data[data.key] = data.value
@@ -967,6 +961,10 @@ export default {
       }
 
       return locked
+    },
+    onUpadteLine () {
+      console.log('zzzzzzzzzzzzzzzzzzzzzzz')
+      this.canvas.updateProps()
     },
     onUpdateProps (node) {
       // 如果是node属性改变，需要传入node，重新计算node相关属性值
