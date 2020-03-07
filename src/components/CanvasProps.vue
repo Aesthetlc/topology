@@ -327,6 +327,48 @@
           </div>
         </div>
       </div>
+      <div class="title" style="text-indent:1em"><p>图片</p></div>
+      <div class="items">
+        <div class="grid">
+          <div class="first" style="display:flex;align-items:center">
+            <div style="margin-right:10px">图片选择</div>
+            <div class="avatar-uploader">
+              <el-upload
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :show-file-list="false"
+                :http-request="uploadImage"
+              >
+                <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+              </el-upload>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="items">
+        <div class="grid">
+          <div class="first">
+            <div>宽（px）{{props.node.imageWidth}}</div>
+            <div>
+              <el-input-number
+                v-model="props.node.imageWidth"
+                controls-position="right"
+                @change="onChange"
+              ></el-input-number>
+            </div>
+          </div>
+          <div class="second">
+            <div>高（px）{{props.node.imageHeight}}</div>
+            <div>
+              <el-input-number
+                v-model="props.node.imageHeight"
+                controls-position="right"
+                @change="onChange"
+              ></el-input-number>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div v-if="props.line">
       <div class="title" style="text-indent:1em"><p>位置</p></div>
@@ -1162,7 +1204,8 @@ export default {
         'lineUp',
         'lineDown'
       ],
-      drowdown: 0
+      drowdown: 0,
+      imageUrl: ''
     }
   },
   props: {
@@ -1213,6 +1256,7 @@ export default {
           if (newvalue.node.gradientToColor === undefined) {
             this.props.node.gradientToColor = '#00FA9A'
           }
+          this.imageUrl = this.props.node.image
         }
         if (newvalue.line) {
           // 这个位置是处理el-input-number 终点的x和y  问题解决，原因还未知
@@ -1282,6 +1326,7 @@ export default {
       this.$emit('changeLine')
     },
     onChange () {
+      debugger
       this.$emit('change', this.props.node)
     },
     changeStatus (params) {
@@ -1340,6 +1385,14 @@ export default {
     },
     handleClose (done) {
       done()
+    },
+    uploadImage (params) {
+      debugger
+      // const data = new FormData()
+      // data.append('image', params.file)
+      this.imageUrl = URL.createObjectURL(params.file)
+      this.props.node.image = this.imageUrl
+      this.onChange()
     },
     // 编辑器样式语言
     editorInit () {
@@ -1476,5 +1529,28 @@ svg {
   .icon-item:hover {
     background: #409eff;
   }
+}
+.avatar-uploader /deep/ .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader /deep/ .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 78px;
+  height: 78px;
+  line-height: 78px;
+  text-align: center;
+}
+.avatar {
+  width: 78px;
+  height: 78px;
+  display: block;
 }
 </style>

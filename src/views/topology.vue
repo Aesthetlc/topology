@@ -832,6 +832,12 @@ export default {
     } else {
       this.loading = false
     }
+    window.onresize = () => {
+      return (() => {
+        this.canvas.resize()
+        this.canvas.overflow()
+      })()
+    }
   },
   methods: {
     async open () {
@@ -963,10 +969,10 @@ export default {
       return locked
     },
     onUpadteLine () {
-      console.log('zzzzzzzzzzzzzzzzzzzzzzz')
       this.canvas.updateProps()
     },
     onUpdateProps (node) {
+      debugger
       // 如果是node属性改变，需要传入node，重新计算node相关属性值
       // 如果是line属性改变，无需传参
       this.canvas.updateProps(node)
@@ -998,9 +1004,9 @@ body {
   margin: 0px;
 }
 .left,
-.right {
+.props {
   background-color: #f8f8f8;
-  height: calc(100vh - 60px);
+  height: calc(100vh - 64px);
 }
 .left {
   .title {
@@ -1035,22 +1041,24 @@ body {
 }
 .props {
   flex-shrink: 0;
-  width: 280px;
+  width: 300px;
   padding: 0.1rem 0;
   background-color: #f8f8f8;
   border-left: 1px solid #d9d9d9;
-  overflow: hidden;
-  // overflow: auto;
+  // overflow: hidden;
+  overflow-y: auto;
   position: relative;
 }
+
 .context-menu {
   position: fixed;
   z-index: 10;
 }
 .full {
-  flex: 1;
-  position: relative;
-  // overflow: auto;
-  background: #fff;
-}
+    flex: 1;
+    width: initial;
+    position: relative;
+    overflow: auto;
+    background: #fff;
+  }
 </style>

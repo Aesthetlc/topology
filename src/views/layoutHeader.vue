@@ -8,14 +8,17 @@
       background-color="#f8f8f8"
     >
       <el-menu-item index="1" @click="onOpen">新建视图</el-menu-item>
-      <el-menu-item index="2" @click="aboutMe">关于我们</el-menu-item>
-      <el-menu-item index="3" @click="loadJson" :disabled="disabledFlag"
+      <el-menu-item index="2" @click="onSave" :disabled="disabledFlag"
+        >保存视图</el-menu-item
+      >
+      <el-menu-item index="3" @click="aboutMe">关于我们</el-menu-item>
+      <el-menu-item index="4" @click="loadJson" :disabled="disabledFlag"
         >加载json</el-menu-item
       >
-      <el-menu-item index="4" @click="showJson" :disabled="disabledFlag"
+      <el-menu-item index="5" @click="showJson" :disabled="disabledFlag"
         >展示json</el-menu-item
       >
-      <el-menu-item index="5" @click="saveImg" :disabled="disabledFlag"
+      <el-menu-item index="6" @click="saveImg" :disabled="disabledFlag"
         >保存图片</el-menu-item
       >
     </el-menu>
@@ -136,7 +139,17 @@ export default {
         'lineUp',
         'lineDown'
       ],
-      lineNames: ['curve', 'polyline', 'line']
+      lineNames: ['curve', 'polyline', 'line'],
+      data: {
+        id: '',
+        version: '',
+        data: { nodes: [], lines: [] },
+        name: '空白文件',
+        desc: '',
+        image: '',
+        userId: '',
+        shared: false
+      }
     }
   },
   components: {
@@ -174,6 +187,41 @@ export default {
     },
     onOpen () {
       this.$router.push({ path: '/topology' })
+    },
+    onSave () {
+      debugger
+      if (!this.$store.state.canvas) {
+        return
+      }
+      // 拿到canvas.data数据
+      this.data.data = this.$store.state.canvas.data
+      // 调用canvas的缩略图的方法
+      this.$store.state.canvas.toImage(null, null, async blob => {
+        console.log(111111111)
+        // 这个是我上传到服务器，服务器给我返回的一个file
+        // const file = await this.Upload(blob, this.data.shared)
+        // console.log(file)
+        // // 可以拿到file的urlconsole.log(a)
+        // this.data.image = file.url
+        // // 调用保存的方法就可以了
+        // const ret = await this.service.Save(this.data)
+        // console.log(ret)
+      })
+    },
+    async Upload (blob, shared = false, filename = '/topology/thumb.png') {
+      const form = new FormData()
+      form.append('path', filename)
+      form.append('randomName', '1')
+      form.append('public', shared + '')
+      form.append('file', blob)
+      console.log(form)
+      debugger
+      const ret = await this.http.PostForm('/api/image', form)
+      if (ret.error) {
+        return null
+      }
+
+      return ret
     },
     aboutMe () {
       const h = this.$createElement
@@ -238,7 +286,7 @@ export default {
     flex: 1;
   }
 }
-/deep/ .el-menu--horizontal>.el-submenu.is-active .el-submenu__title{
-  border: 1px solid transparent !important
+/deep/ .el-menu--horizontal > .el-submenu.is-active .el-submenu__title {
+  border: 1px solid transparent !important;
 }
 </style>
