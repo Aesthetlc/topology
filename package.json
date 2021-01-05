@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@angular/core": "^9.0.2",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.4",
     "element-ui": "^2.13.0",
     "le5le-components": "^0.8.9",
